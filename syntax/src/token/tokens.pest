@@ -1,0 +1,95 @@
+// Ident
+ident_char = { ASCII_ALPHA | ASCII_DIGIT | "_" }
+ident_start = { ASCII_ALPHA | "_" }
+
+ident = @{ ident_start ~ ident_char* }
+
+// Numbers
+// All numbers are parsed as positive
+// Sign is determined by the reparser
+digit = _{ ASCII_DIGIT | "_" }
+
+// Integer
+hex_digit = _{ ASCII_HEX_DIGIT | "_" }
+hex_int =  @{ (hex_digit+ ~ "h") | "0x" ~ hex_digit+ }
+
+binary_int = @{ "0b" ~ ("0" | "1")+ }
+
+decimal_int = @{ digit+ }
+
+integer = { hex_int | binary_int | decimal_int}
+
+// Float
+float = { digit* ~ "." ~ digit* }
+
+number = _{ float | integer }
+
+// String
+double_quote_string = _{ "\"" ~ str_inner ~ "\"" }
+str_inner = _{str_char*}
+str_char = _{
+    !("\"" | "\\") ~ ANY
+    | "\\" ~ ("\"" | "\\")
+}
+
+raw_string = _{
+    "r" ~ PUSH("#"*) ~ "\""    
+    ~ raw_string_interior
+    ~ "\"" ~ POP             
+}
+raw_string_interior = _{
+    (
+        !("\"" ~ PEEK)
+        ~ ANY
+    )*
+}
+
+string = { raw_string | double_quote_string }
+
+// Keywords
+keyword = { "func" | "let" | "struct" | "enum" | "type" }
+
+// Glyphs
+glyph =
+    { "("
+    | ")"
+    | "["
+    | "]"
+    | "{"
+    | "}"
+    | "<"
+    | ">"
+    | "->"
+    | "::"
+    | ":"
+    | ";"
+    | ","
+    | "="
+    | "?"
+    | "!"
+    | "~"
+    | "@"
+    | "#"
+    | "$"
+    | "%"
+    | "^"
+    | "&"
+    | "*"
+    | "+"
+    | "-"
+    | "/"
+    | "\\"
+    | "|"
+    | "_"
+    }
+
+// Seperators
+WHITESPACE = _{ " " | "\\t" | NEWLINE }
+COMMENT = _{ "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
+
+
+// Tokens
+token = _{ keyword | string | ident | glyph | number }
+
+
+token_list = { SOI ~ token* ~ EOI }

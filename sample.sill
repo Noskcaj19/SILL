@@ -1,0 +1,26 @@
+/*
+    Syntax sample and test
+*/
+
+func hello_world() {
+    print("Hello, World!")
+}
+
+func hello(name: str) {
+    print("Hello " + str)
+}
+
+func add(x, y) -> _ {
+    return x + y
+}
+
+struct Person {
+    age: int
+    name: str
+}
+
+enum Color {
+    Red = (255, 0, 0)
+    Blue = (0, 255, 0)
+    Green = (0, 0, 255)
+}

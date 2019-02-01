@@ -1,0 +1,10 @@
+[package]
+name = "sill"
+version = "0.1.0"
+authors = ["Noskcaj <kcajdev@gmail.com>"]
+edition = "2018"
+
+[dependencies.syntax]
+path = "syntax"
+
+[dependencies]
