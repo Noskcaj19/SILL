@@ -87,9 +87,10 @@ glyph =
 WHITESPACE = _{ " " | "\\t" | NEWLINE }
 COMMENT = _{ "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
 
+line_comment = ${ "//" ~ (!"\n" ~ ANY)* ~ "\n" }
 
 // Tokens
-token = _{ keyword | string | ident | glyph | number }
+token = _{ line_comment | keyword | string | ident | glyph | number }
 
 
 token_list = { SOI ~ token* ~ EOI }

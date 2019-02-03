@@ -26,8 +26,6 @@ pub enum Token<'input> {
     Integer(i64),
     Float(f64),
 
-    Operator(&'input str),
-
     Let,
     Func,
     Struct,
@@ -278,6 +276,8 @@ pub fn tokenize(input: &str) -> Result<Vec<SpannedToken>, (SpannedError, Vec<Spa
                 SpannedToken::new(tok, token.as_span())
             }
             Rule::EOI => break,
+
+            Rule::line_comment => continue,
 
             // Impossible (silent rules)
             Rule::token
