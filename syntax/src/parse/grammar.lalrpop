@@ -25,11 +25,13 @@ Integer: ast::Literal = "int literal" => ast::Literal::Int(<>);
 Float: ast::Literal = "float literal" => ast::Literal::Float(<>.into());
 
 String: ast::Literal = "str literal" => ast::Literal::String(<>.into());
+Char: ast::Literal = "char literal" => ast::Literal::Char(<>);
 
 Literal = {
     Integer,
     Float,
     String,
+    Char
 };
 
 
@@ -44,6 +46,7 @@ extern {
     enum Token<'input> {
         "ident" => Token::Ident(<&'input str>),
         "str literal" => Token::StringLit(<&'input str>),
+        "char literal" => Token::Char(<char>),
         "int literal" => Token::Integer(<i64>),
         "float literal" => Token::Float(<f64>),
 

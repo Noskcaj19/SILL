@@ -12,6 +12,7 @@ pub enum Error<'input> {
     InvalidHex,
     InvalidBinary,
     InvalidFloat,
+    InvalidEscape,
     UnknownKeyword,
     UnknownGlyph,
     UnknownSymbol(&'input str),
@@ -23,6 +24,7 @@ pub enum Error<'input> {
 pub enum Token<'input> {
     Ident(&'input str),
     StringLit(&'input str),
+    Char(char),
     Integer(i64),
     Float(f64),
 
@@ -133,6 +135,24 @@ pub fn tokenize(input: &str) -> Result<Vec<SpannedToken>, (SpannedError, Vec<Spa
                 let str = token.as_str();
 
                 SpannedToken::new(Token::StringLit(&str[1..str.len() - 1]), token.as_span())
+            }
+            Rule::char => {
+                let str = token.as_str();
+                let str = &str[1..str.len() - 1];
+
+                let final_char = match str {
+                    r"\n" => '\n',
+                    r"\\" => '\\',
+                    _ if str.len() == 1 => str.chars().next().unwrap(),
+                    _ => {
+                        return Err((
+                            SpannedError::spanned(Error::InvalidEscape, token.as_span()),
+                            output_tokens,
+                        ));
+                    }
+                };
+
+                SpannedToken::new(Token::Char(final_char), token.as_span())
             }
             Rule::integer => {
                 let stripped_int = token.as_str().replace('_', "");
@@ -289,6 +309,7 @@ pub fn tokenize(input: &str) -> Result<Vec<SpannedToken>, (SpannedError, Vec<Spa
             | Rule::raw_string_interior
             | Rule::str_inner
             | Rule::str_char
+            | Rule::char_inner
             | Rule::number
             | Rule::hex_digit
             | Rule::hex_int

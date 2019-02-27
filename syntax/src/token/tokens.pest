@@ -46,6 +46,13 @@ raw_string_interior = _{
 
 string = { raw_string | double_quote_string }
 
+char_inner = {
+	("\\" ~ ANY ) | ANY
+}
+
+// Char
+char = @{ "'" ~ char_inner ~ "'" }
+
 // Keywords
 keyword = { "func" | "let" | "struct" | "enum" | "type" }
 
@@ -90,7 +97,7 @@ COMMENT = _{ "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
 line_comment = ${ "//" ~ (!"\n" ~ ANY)* ~ "\n" }
 
 // Tokens
-token = _{ line_comment | keyword | string | ident | glyph | number }
+token = _{ line_comment | keyword | string | char | ident | glyph | number }
 
 
 token_list = { SOI ~ token* ~ EOI }
