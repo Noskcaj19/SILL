@@ -14,6 +14,16 @@ pub enum Literal {
 #[derive(Debug, Clone)]
 pub enum Expression {
     Literal(Literal),
+    Ident(String),
+    FunctionDef {
+        name: String,
+        params: Vec<Expression>,
+        body: Vec<Expression>,
+    },
+    FunctionCall {
+        ident: String,
+        args: Vec<Expression>,
+    },
 }
 
 // pub struct Program(Vec<>)

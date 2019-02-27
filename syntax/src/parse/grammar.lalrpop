@@ -5,17 +5,25 @@ use crate::token::{Token};
 
 grammar<'input, 'err>(errors: &'err mut Vec<TErrorRecovery<'input>>);
 
-Sep<T, S>: Vec<T> = {
-    <v:(<T> S)*> <e:T?> => match e {
-        None=> v,
-        Some(e) => {
-            let mut v = v;
-            v.push(e);
-            v
-        }
-    }
+// Utils
+
+SingleComma: () = {
+    "," => (),
+    <!> => errors.push(<>)
 };
 
+Sep<Rule, Separator>: Vec<Rule> =
+    <rules: (<Rule> Separator)*> <last: Rule?> => {
+        let mut rules = rules;
+        rules.extend(last);
+        rules
+    };
+
+Comma<Rule>: Vec<Rule> = {
+    Sep<Rule, SingleComma>
+};
+
+// Program grammar
 
 pub Program: ast::Program = {
     <Expression*> => ast::Program(<>.into())
@@ -35,9 +43,32 @@ Literal = {
 };
 
 
+Ident: ast::Expression = {
+    "ident" => ast::Expression::Ident(<>.into())
+};
+
 Expression: ast::Expression = {
     Literal => ast::Expression::Literal(<>),
-}
+    Ident,
+    FunctionDef,
+    FunctionCall,
+};
+
+FunctionDef: ast::Expression = {
+    "func" <id:"ident"> "(" <params: Comma<Ident>> ")" "{" <body:Expression*> "}" => ast::Expression::FunctionDef {
+        name: id.into(),
+        params,
+        body,
+    }
+};
+
+FunctionCall: ast::Expression = {
+    <id:"ident"> "(" <args: Comma<Expression>> ")" => ast::Expression::FunctionCall {
+        ident: id.into(),
+        args,
+    }
+};
+
 
 extern {
     type Location = usize;
