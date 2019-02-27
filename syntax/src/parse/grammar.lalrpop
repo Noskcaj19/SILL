@@ -1,0 +1,88 @@
+
+use crate::parse::{self, TErrorRecovery};
+use crate::parse::ast;
+use crate::token::{Token};
+
+grammar<'input, 'err>(errors: &'err mut Vec<TErrorRecovery<'input>>);
+
+Sep<T, S>: Vec<T> = {
+    <v:(<T> S)*> <e:T?> => match e {
+        None=> v,
+        Some(e) => {
+            let mut v = v;
+            v.push(e);
+            v
+        }
+    }
+};
+
+
+pub Program: ast::Program = {
+    <Expression*> => ast::Program(<>.into())
+};
+
+Integer: ast::Literal = "int literal" => ast::Literal::Int(<>);
+Float: ast::Literal = "float literal" => ast::Literal::Float(<>.into());
+
+String: ast::Literal = "str literal" => ast::Literal::String(<>.into());
+
+Literal = {
+    Integer,
+    Float,
+    String,
+};
+
+
+Expression: ast::Expression = {
+    Literal => ast::Expression::Literal(<>),
+}
+
+extern {
+    type Location = usize;
+    type Error = parse::Error;
+
+    enum Token<'input> {
+        "ident" => Token::Ident(<&'input str>),
+        "str literal" => Token::StringLit(<&'input str>),
+        "int literal" => Token::Integer(<i64>),
+        "float literal" => Token::Float(<f64>),
+
+        "let" => Token::Let,
+        "func" => Token::Func,
+        "struct" => Token::Struct,
+        "enum" => Token::Enum,
+        "type" => Token::Type,
+
+        "(" => Token::LParen,
+        ")" => Token::RParen,
+        "[" => Token::LBracket,
+        "]" => Token::RBracket,
+        "{" => Token::LBrace,
+        "}" => Token::RBrace,
+        "<" => Token::LAngleBracket,
+        ">" => Token::RAngleBracket,
+
+        "->" => Token::Arrow,
+        "::" => Token::DoubleColon,
+        ":" => Token::Colon,
+        ";" => Token::Semicolon,
+        "," => Token::Comma,
+        "=" => Token::Equal,
+        "?" => Token::Question,
+        "!" => Token::Bang,
+        "~" => Token::Tilde,
+        "@" => Token::At,
+        "#" => Token::Hash,
+        "$" => Token::Dollar,
+        "%" => Token::Percent,
+        "^" => Token::Carrot,
+        "&" => Token::Ampersand,
+        "*" => Token::Star,
+        "+" => Token::Plus,
+        "-" => Token::Minus,
+        "/" => Token::Slash,
+        "\\" => Token::BackSlash,
+        "|" => Token::Pipe,
+        "_" => Token::Underscore,
+    }
+}
