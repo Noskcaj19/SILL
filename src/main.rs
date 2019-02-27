@@ -28,5 +28,5 @@ fn main() {
     let parse =
         syntax::parse::grammar::ProgramParser::new().parse(&mut errors, new_tokens.into_iter());
 
-    println!("{:#?}", parse);
+    println!("{:#?}\n\n{:#?}", parse, errors);
 }

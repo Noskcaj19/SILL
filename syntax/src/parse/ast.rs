@@ -14,6 +14,7 @@ pub enum Literal {
 #[derive(Debug, Clone)]
 pub enum Expression {
     Literal(Literal),
+    Operator(String),
     Ident(String),
     FunctionDef {
         name: String,
@@ -24,6 +25,9 @@ pub enum Expression {
         ident: String,
         args: Vec<Expression>,
     },
+    Infix {
+        lhs: Box<Expression>,
+        op: String,
+        rhs: Box<Expression>,
+    },
 }
-
-// pub struct Program(Vec<>)

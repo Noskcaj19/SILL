@@ -47,9 +47,34 @@ Ident: ast::Expression = {
     "ident" => ast::Expression::Ident(<>.into())
 };
 
-Expression: ast::Expression = {
+Operator: String = {
+    "+" => "+".into(),
+    "-" => "-".into(),
+    "*" => "*".into(),
+    "/" => "/".into(),
+    "%" => "%".into(),
+    "^" => "^".into(),
+    "&" => "&".into(),
+};
+
+AtomicExpr: ast::Expression = {
+    //Operator,
     Literal => ast::Expression::Literal(<>),
     Ident,
+};
+
+InfixExpr: ast::Expression = {
+    AtomicExpr,
+    <lhs:AtomicExpr> <op:Operator> <rhs:InfixExpr> => ast::Expression::Infix {
+        lhs: Box::new(lhs),
+        op,
+        rhs: Box::new(rhs),
+    },
+};
+
+Expression: ast::Expression = {
+    InfixExpr,
+
     FunctionDef,
     FunctionCall,
 };
